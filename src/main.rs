@@ -30,6 +30,9 @@ fn main() {
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
                 println!("You win!");
+                println!("Press Enter to exit...");
+                let mut exit = String::new();
+                io::stdin().read_line(&mut exit).expect("Failed to read line");
                 break;
             }
         }
