@@ -22,6 +22,12 @@ jobs:
         run: cargo build --release
       - name: Build for Windows
         run: cargo build --release --target x86_64-pc-windows-gnu
+      - name: Delete Existing Tag
+        if: always()
+        run: |
+          TAG_NAME=$(date +'%Y%m%d%H%M')
+          git tag -d $TAG_NAME || true
+          git push origin :refs/tags/$TAG_NAME || true
       - name: Create Tag
         id: create_tag
         run: |
