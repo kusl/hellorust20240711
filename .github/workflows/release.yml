@@ -22,16 +22,10 @@ jobs:
         run: cargo build --release
       - name: Build for Windows
         run: cargo build --release --target x86_64-pc-windows-gnu
-      - name: Delete Existing Tag
-        if: always()
-        run: |
-          TAG_NAME=$(date +'%Y%m%d%H%M')
-          git tag -d $TAG_NAME || true
-          git push origin :refs/tags/$TAG_NAME || true
-      - name: Create Tag
+      - name: Create Unique Tag
         id: create_tag
         run: |
-          TAG_NAME=$(date +'%Y%m%d%H%M')
+          TAG_NAME=$(date +'%Y%m%d%H%M%S')-$(openssl rand -hex 3)
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
           echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
           git tag $TAG_NAME
