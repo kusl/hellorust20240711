@@ -25,11 +25,16 @@ jobs:
       - name: Create Unique Tag
         id: create_tag
         run: |
-          TAG_NAME=$(date +'%Y%m%d%H%M%S')-$(openssl rand -hex 3)
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-          echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          while true; do
+            TAG_NAME=$(date +'%Y%m%d%H%M%S')-$(openssl rand -hex 6)
+            if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+              echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+              echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
+              git tag $TAG_NAME
+              git push origin $TAG_NAME
+              break
+            fi
+          done
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
