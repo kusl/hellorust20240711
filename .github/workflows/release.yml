@@ -15,7 +15,7 @@ jobs:
         with:
           components: rustfmt, clippy
       - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y mingw-w64
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64 gcc-mingw-w64-x86-64
       - name: Install Windows Target
         run: rustup target add x86_64-pc-windows-gnu
       - name: Build for Linux
