@@ -44,19 +44,15 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
         with:
           files: ./target/release/helloworld
-          tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_NAME }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ env.TAG_NAME }}
           draft: false
           prerelease: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Windows Release Asset
         uses: marvinpinto/action-automatic-releases@latest
         with:
           files: ./target/x86_64-pc-windows-gnu/release/helloworld.exe
-          tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_NAME }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ env.TAG_NAME }}
           draft: false
           prerelease: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
