@@ -27,33 +27,36 @@ jobs:
         run: |
           TAG_NAME=$(date +'%Y%m%d%H%M')
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
           git tag $TAG_NAME
           git push origin $TAG_NAME
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
+          draft: false
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Linux Release Asset
+        uses: marvinpinto/action-automatic-releases@latest
         with:
+          files: ./target/release/helloworld
           tag_name: ${{ env.TAG_NAME }}
           release_name: Release ${{ env.TAG_NAME }}
           draft: false
           prerelease: true
-      - name: Upload Linux Release Asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/release/helloworld
-          asset_name: helloworld
-          asset_content_type: application/octet-stream
       - name: Upload Windows Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          files: ./target/x86_64-pc-windows-gnu/release/helloworld.exe
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }}
+          draft: false
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/x86_64-pc-windows-gnu/release/helloworld.exe
-          asset_name: helloworld.exe
-          asset_content_type: application/octet-stream
