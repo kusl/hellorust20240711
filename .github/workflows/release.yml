@@ -22,19 +22,14 @@ jobs:
         run: cargo build --release
       - name: Build for Windows
         run: cargo build --release --target x86_64-pc-windows-gnu
-      - name: Create Unique Tag
+      - name: Create Tag
         id: create_tag
         run: |
-          while true; do
-            TAG_NAME=$(date +'%Y%m%d%H%M%S')-$(openssl rand -hex 6)
-            if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-              echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-              echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
-              git tag $TAG_NAME
-              git push origin $TAG_NAME
-              break
-            fi
-          done
+          TAG_NAME=$(date +'%Y%m%d%H%M')
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_ENV
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -46,20 +41,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Linux Release Asset
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v2
         with:
-          artifacts: ./target/release/helloworld
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.TAG_NAME }}
-          name: Release ${{ env.TAG_NAME }}
-          draft: false
-          prerelease: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: ./target/release/helloworld
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Windows Release Asset
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v2
         with:
-          artifacts: ./target/x86_64-pc-windows-gnu/release/helloworld.exe
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.TAG_NAME }}
-          name: Release ${{ env.TAG_NAME }}
-          draft: false
-          prerelease: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: ./target/x86_64-pc-windows-gnu/release/helloworld.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
