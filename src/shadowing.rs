@@ -16,7 +16,7 @@ mod tests {
     #[test]
     fn test_shadow_string_length() {
         let spaces = "     ";
-        assert_eq!("    ", spaces);
+        assert_eq!("     ", spaces);
         let spaces = spaces.len();
         assert_eq!(5, spaces);
     }
