@@ -1,6 +1,7 @@
 mod my_math;
 mod shadowing;
 mod my_data_types;
+mod greatest_common_divisor;
 
 use rand::Rng;
 use std::cmp::Ordering;
