@@ -44,5 +44,8 @@ fn main() {
         println!("The sum of your guess and the secret number is: {sum}");
         let product = my_math::multiply(guess as i32, secret_number as i32);
         println!("The product of your guess and the secret number is: {product}");
+
+        let gcd = greatest_common_divisor::gcd(guess as u64, secret_number as u64);
+        println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
 }
