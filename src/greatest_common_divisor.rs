@@ -12,7 +12,6 @@ pub fn gcd(mut n: u32, mut m: u32) -> u32 {
     }
     n
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,5 +73,15 @@ mod tests {
         assert_eq!(gcd(0, 0), 0);
         assert_eq!(gcd(0, 5), 5);
         assert_eq!(gcd(5, 0), 5);
+    }
+
+    #[test]
+    fn test_large_prime_numbers() {
+        assert_eq!(gcd(1_000_003, 1_000_019), 1);
+    }
+
+    #[test]
+    fn test_large_composite_numbers() {
+        assert_eq!(gcd(1_000_000, 500_000), 500_000);
     }
 }
