@@ -6,8 +6,10 @@ mod greatest_common_divisor;
 use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
+use reqwest::blocking::Client;
+use reqwest::Error;
 
-fn main() {
+fn main() -> Result<(), Error> {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
@@ -48,4 +50,14 @@ fn main() {
         let gcd = greatest_common_divisor::gcd(guess as u64, secret_number as u64);
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
+
+    // Perform the HTTP GET request
+    let client = Client::new();
+    let response = client.get("https://nice.runasp.net/Analytics/HelloWorld")
+        .send()?
+        .text()?;
+
+    println!("Response from server: {response}");
+
+    Ok(())
 }
