@@ -10,12 +10,11 @@ use reqwest::blocking::Client;
 use reqwest::Error;
 
 fn main() -> Result<(), Error> {
-    play_guessing_game();
-    fetch_hello_world()?;
+    play_guessing_game()?;
     Ok(())
 }
 
-fn play_guessing_game() {
+fn play_guessing_game() -> Result<(), Error> {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
@@ -41,6 +40,7 @@ fn play_guessing_game() {
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
                 println!("You win!");
+                fetch_hello_world()?;
                 println!("Press Enter to exit...");
                 let mut exit = String::new();
                 io::stdin().read_line(&mut exit).expect("Failed to read line");
@@ -56,6 +56,8 @@ fn play_guessing_game() {
         let gcd = greatest_common_divisor::gcd(guess, secret_number);
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
+
+    Ok(())
 }
 
 fn fetch_hello_world() -> Result<(), Error> {
