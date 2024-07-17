@@ -1,8 +1,8 @@
-pub fn add(a: i32, b: i32) -> i32 {
+pub fn add(a: u32, b: u32) -> u32 {
     a + b
 }
 
-pub fn multiply(a: i32, b: i32) -> i32 {
+pub fn multiply(a: u32, b: u32) -> u32 {
     a * b
 }
 
@@ -33,10 +33,5 @@ mod tests {
     #[test]
     fn test_multiply_zero() {
         assert_eq!(multiply(2, 0), 0);
-    }
-
-    #[test]
-    fn test_multiply_negative() {
-        assert_eq!(multiply(2, -3), -6);
     }
 }

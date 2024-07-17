@@ -42,12 +42,15 @@ fn main() -> Result<(), Error> {
             }
         }
 
-        let sum = my_math::add(guess as i32, secret_number as i32);
+        let sum = my_math::add(
+            guess,
+            secret_number
+        );
         println!("The sum of your guess and the secret number is: {sum}");
-        let product = my_math::multiply(guess as i32, secret_number as i32);
+        let product = my_math::multiply(guess, secret_number);
         println!("The product of your guess and the secret number is: {product}");
 
-        let gcd = greatest_common_divisor::gcd(guess as u64, secret_number as u64);
+        let gcd = greatest_common_divisor::gcd(guess, secret_number);
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
 

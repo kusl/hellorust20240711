@@ -1,4 +1,4 @@
-pub fn gcd(mut n: u64, mut m: u64) -> u64 {
+pub fn gcd(mut n: u32, mut m: u32) -> u32 {
     if m == 0 {
         return n;
     }
@@ -37,8 +37,8 @@ mod tests {
         assert_eq!(gcd(30, 15), 15);
 
         // Test with very large numbers
-        assert_eq!(gcd(u64::MAX, u64::MAX - 1), 1);
-        assert_eq!(gcd(u64::MAX - 1, u64::MAX - 2), 1);
+        assert_eq!(gcd(u32::MAX, u32::MAX - 1), 1);
+        assert_eq!(gcd(u32::MAX - 1, u32::MAX - 2), 1);
 
         // Test with very small numbers
         assert_eq!(gcd(1, 1), 1);
