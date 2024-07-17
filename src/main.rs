@@ -10,6 +10,12 @@ use reqwest::blocking::Client;
 use reqwest::Error;
 
 fn main() -> Result<(), Error> {
+    play_guessing_game();
+    fetch_hello_world()?;
+    Ok(())
+}
+
+fn play_guessing_game() {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
@@ -42,10 +48,7 @@ fn main() -> Result<(), Error> {
             }
         }
 
-        let sum = my_math::add(
-            guess,
-            secret_number
-        );
+        let sum = my_math::add(guess, secret_number);
         println!("The sum of your guess and the secret number is: {sum}");
         let product = my_math::multiply(guess, secret_number);
         println!("The product of your guess and the secret number is: {product}");
@@ -53,8 +56,9 @@ fn main() -> Result<(), Error> {
         let gcd = greatest_common_divisor::gcd(guess, secret_number);
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
+}
 
-    // Perform the HTTP GET request
+fn fetch_hello_world() -> Result<(), Error> {
     let client = Client::new();
     match client.get("https://nice.runasp.net/Analytics/HelloWorld").send() {
         Ok(response) => {
@@ -65,6 +69,5 @@ fn main() -> Result<(), Error> {
             println!("Failed to fetch response: {e}");
         }
     }
-
     Ok(())
 }
