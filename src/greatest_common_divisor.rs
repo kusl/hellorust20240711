@@ -84,4 +84,26 @@ mod tests {
     fn test_large_composite_numbers() {
         assert_eq!(gcd(1_000_000, 500_000), 500_000);
     }
+
+    #[test]
+    fn test_one_is_zero() {
+        assert_eq!(gcd(0, 5), 5);
+        assert_eq!(gcd(5, 0), 5);
+    }
+
+    #[test]
+    fn test_both_are_zero() {
+        assert_eq!(gcd(0, 0), 0);
+    }
+
+    #[test]
+    fn test_one_is_one() {
+        assert_eq!(gcd(1, 5), 1);
+        assert_eq!(gcd(5, 1), 1);
+    }
+
+    #[test]
+    fn test_large_numbers() {
+        assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
+    }
 }
