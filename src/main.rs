@@ -53,11 +53,15 @@ fn main() -> Result<(), Error> {
 
     // Perform the HTTP GET request
     let client = Client::new();
-    let response = client.get("https://nice.runasp.net/Analytics/HelloWorld")
-        .send()?
-        .text()?;
-
-    println!("Response from server: {response}");
+    match client.get("https://nice.runasp.net/Analytics/HelloWorld").send() {
+        Ok(response) => {
+            let text = response.text()?;
+            println!("Response from server: {text}");
+        }
+        Err(e) => {
+            println!("Failed to fetch response: {e}");
+        }
+    }
 
     Ok(())
 }
