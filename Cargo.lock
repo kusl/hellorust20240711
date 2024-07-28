@@ -134,6 +134,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "etcetera"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "136d1b5283a1ab77bd9257427ffd09d8667ced0570b6f938942bc7568ed5b943"
+dependencies = [
+ "cfg-if",
+ "home",
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "fastrand"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -266,8 +277,20 @@ name = "helloworld"
 version = "0.1.1"
 dependencies = [
  "dotenv",
+ "etcetera",
  "rand",
  "reqwest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "home"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3d1354bf6b7235cb4a0576c2619fd4ed18183f689b12b006a0ee7329eeff9a5"
+dependencies = [
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

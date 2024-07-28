@@ -5,16 +5,46 @@ mod greatest_common_divisor;
 
 use rand::Rng;
 use std::cmp::Ordering;
+use std::fs;
 use std::io;
 use reqwest::blocking::Client;
 use reqwest::Error;
+use etcetera::{choose_app_strategy, AppStrategyArgs, AppStrategy};
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct Config {
+    analytics_consent: bool,
+}
 
 fn main() -> Result<(), Error> {
-    play_guessing_game()?;
+    let strategy = choose_app_strategy(AppStrategyArgs {
+        top_level_domain: "org".to_string(),
+        author: "Kushal Hada".to_string(),
+        app_name: "KusGuessingGame".to_string(),
+    }).unwrap();
+
+    let config_path = strategy.config_dir().join("config.json");
+    let config = if config_path.exists() {
+        let config_data = fs::read_to_string(&config_path).expect("Unable to read config file");
+        serde_json::from_str(&config_data).expect("Unable to parse config file")
+    } else {
+        println!("Do you consent to analytics? (yes/no)");
+        let mut consent = String::new();
+        io::stdin().read_line(&mut consent).expect("Failed to read line");
+        let analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
+        let new_config = Config { analytics_consent };
+        let config_data = serde_json::to_string(&new_config).expect("Unable to serialize config");
+        fs::create_dir_all(strategy.config_dir()).expect("Unable to create config directory");
+        fs::write(&config_path, config_data).expect("Unable to write config file");
+        new_config
+    };
+
+    play_guessing_game(config.analytics_consent)?;
     Ok(())
 }
 
-fn play_guessing_game() -> Result<(), Error> {
+fn play_guessing_game(analytics_consent: bool) -> Result<(), Error> {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
@@ -40,7 +70,9 @@ fn play_guessing_game() -> Result<(), Error> {
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
                 println!("You win!");
-                fetch_hello_world()?;
+                if analytics_consent {
+                    fetch_hello_world()?;
+                }
                 println!("Press Enter to exit...");
                 let mut exit = String::new();
                 io::stdin().read_line(&mut exit).expect("Failed to read line");
