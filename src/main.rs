@@ -5,6 +5,7 @@ mod greatest_common_divisor;
 
 use rand::Rng;
 use std::cmp::Ordering;
+use std::env;
 use std::fs;
 use std::io;
 use reqwest::blocking::Client;
@@ -25,20 +26,25 @@ fn main() -> Result<(), Error> {
     }).unwrap();
 
     let config_path = strategy.config_dir().join("config.json");
-    let config = if config_path.exists() {
+    let mut config = if config_path.exists() {
         let config_data = fs::read_to_string(&config_path).expect("Unable to read config file");
         serde_json::from_str(&config_data).expect("Unable to parse config file")
     } else {
+        Config { analytics_consent: false }
+    };
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() > 1 && args[1] == "--update-consent" {
         println!("Do you consent to analytics? (yes/no)");
         let mut consent = String::new();
         io::stdin().read_line(&mut consent).expect("Failed to read line");
-        let analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
-        let new_config = Config { analytics_consent };
-        let config_data = serde_json::to_string(&new_config).expect("Unable to serialize config");
+        config.analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
+        let config_data = serde_json::to_string(&config).expect("Unable to serialize config");
         fs::create_dir_all(strategy.config_dir()).expect("Unable to create config directory");
         fs::write(&config_path, config_data).expect("Unable to write config file");
-        new_config
-    };
+        println!("Consent updated successfully.");
+        return Ok(());
+    }
 
     play_guessing_game(config.analytics_consent)?;
     Ok(())
