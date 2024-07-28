@@ -52,6 +52,7 @@ fn main() -> Result<(), Error> {
 
 fn play_guessing_game(analytics_consent: bool) -> Result<(), Error> {
     println!("Guess the number!");
+    println!("Remember, you can update your consent by running this application with --update-consent flag.");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
 
