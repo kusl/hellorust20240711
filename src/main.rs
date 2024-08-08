@@ -49,6 +49,15 @@ fn main() -> Result<(), GameError> {
         return Ok(());
     }
 
+    if args.len() > 1 && args[1] == "--show-stats" {
+        let game_stats = read_game_stats()?;
+        println!("Game Statistics:");
+        println!("Attempts: {:?}", game_stats.attempts);
+        println!("Secret Number: {}", game_stats.secret_number);
+        println!("Guesses: {:?}", game_stats.guesses);
+        return Ok(());
+    }
+
     play_guessing_game(config.analytics_consent)?;
     Ok(())
 }
@@ -59,7 +68,7 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
     let mut attempts = Vec::new(); // Initialize attempts as a vector
-    let guesses = Vec::new();
+    let mut guesses = Vec::new(); // Initialize guesses as a mutable vector
 
     loop {
         println!("Please input your guess.");
@@ -76,6 +85,7 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
         };
 
         attempts.push(guess); // Add each guess to attempts
+        guesses.push(guess); // Add each guess to guesses
 
         println!("You guessed: {guess}");
 
@@ -141,4 +151,18 @@ fn fetch_hello_world() -> Result<(), GameError> {
         }
     }
     Ok(())
+}
+
+fn read_game_stats() -> Result<GameStats, GameError> {
+    let strategy = choose_app_strategy(AppStrategyArgs {
+        top_level_domain: "org".to_string(),
+        author: "Kushal Hada".to_string(),
+        app_name: "KusGuessingGame".to_string(),
+    }).unwrap();
+
+    let stats_path = strategy.data_dir().join("game_stats.json");
+    let stats_data = fs::read_to_string(&stats_path)?;
+    let game_stats: GameStats = serde_json::from_str(&stats_data)?;
+
+    Ok(game_stats)
 }
