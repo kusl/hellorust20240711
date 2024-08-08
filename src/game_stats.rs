@@ -1,7 +1,7 @@
 // src/game_stats.rs
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct GameStats {
     pub attempts: Vec<u32>,
     pub secret_number: u32,

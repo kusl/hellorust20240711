@@ -4,6 +4,7 @@ mod my_data_types;
 mod greatest_common_divisor;
 mod game_stats;
 mod game_error;
+mod game_history;
 
 use rand::Rng;
 use std::cmp::Ordering;
@@ -15,6 +16,7 @@ use etcetera::{choose_app_strategy, AppStrategyArgs, AppStrategy};
 use serde::{Deserialize, Serialize};
 use game_stats::GameStats;
 use game_error::GameError;
+use game_history::GameHistory;
 
 #[derive(Serialize, Deserialize)]
 struct Config {
@@ -46,15 +48,6 @@ fn main() -> Result<(), GameError> {
         fs::create_dir_all(strategy.config_dir()).expect("Unable to create config directory");
         fs::write(&config_path, config_data).expect("Unable to write config file");
         println!("Consent updated successfully.");
-        return Ok(());
-    }
-
-    if args.len() > 1 && args[1] == "--show-stats" {
-        let game_stats = read_game_stats()?;
-        println!("Game Statistics:");
-        println!("Attempts: {:?}", game_stats.attempts);
-        println!("Secret Number: {}", game_stats.secret_number);
-        println!("Guesses: {:?}", game_stats.guesses);
         return Ok(());
     }
 
@@ -97,6 +90,19 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
                 if analytics_consent {
                     fetch_hello_world()?;
                 }
+                println!("Game Statistics:");
+                println!("Attempts: {:?}", attempts);
+                println!("Secret Number: {}", secret_number);
+                println!("Guesses: {:?}", guesses);
+
+                let game_stats = GameStats {
+                    attempts,
+                    secret_number,
+                    guesses,
+                };
+
+                save_game_stats(&game_stats)?;
+
                 println!("Press Enter to exit...");
                 let mut exit = String::new();
                 io::stdin().read_line(&mut exit).expect("Failed to read line");
@@ -113,14 +119,6 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
 
-    let game_stats = GameStats {
-        attempts,
-        secret_number,
-        guesses,
-    };
-
-    save_game_stats(&game_stats)?;
-
     Ok(())
 }
 
@@ -132,12 +130,23 @@ fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
     }).unwrap();
 
     let stats_path = strategy.data_dir().join("game_stats.json");
-    let stats_data = serde_json::to_string(&game_stats).expect("Unable to serialize game stats");
+
+    let mut game_history = if stats_path.exists() {
+        let stats_data = fs::read_to_string(&stats_path)?;
+        serde_json::from_str(&stats_data).unwrap_or(GameHistory { games: Vec::new() })
+    } else {
+        GameHistory { games: Vec::new() }
+    };
+
+    game_history.games.push(game_stats.clone());
+
+    let stats_data = serde_json::to_string(&game_history).expect("Unable to serialize game stats");
     fs::create_dir_all(strategy.data_dir()).expect("Unable to create data directory");
     fs::write(stats_path, stats_data)?;
 
     Ok(())
 }
+
 
 fn fetch_hello_world() -> Result<(), GameError> {
     let client = Client::new();
@@ -151,18 +160,4 @@ fn fetch_hello_world() -> Result<(), GameError> {
         }
     }
     Ok(())
-}
-
-fn read_game_stats() -> Result<GameStats, GameError> {
-    let strategy = choose_app_strategy(AppStrategyArgs {
-        top_level_domain: "org".to_string(),
-        author: "Kushal Hada".to_string(),
-        app_name: "KusGuessingGame".to_string(),
-    }).unwrap();
-
-    let stats_path = strategy.data_dir().join("game_stats.json");
-    let stats_data = fs::read_to_string(&stats_path)?;
-    let game_stats: GameStats = serde_json::from_str(&stats_data)?;
-
-    Ok(game_stats)
 }
