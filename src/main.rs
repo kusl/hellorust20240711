@@ -2,6 +2,8 @@ mod my_math;
 mod shadowing;
 mod my_data_types;
 mod greatest_common_divisor;
+mod game_stats;
+mod game_error;
 
 use rand::Rng;
 use std::cmp::Ordering;
@@ -9,16 +11,17 @@ use std::env;
 use std::fs;
 use std::io;
 use reqwest::blocking::Client;
-use reqwest::Error;
 use etcetera::{choose_app_strategy, AppStrategyArgs, AppStrategy};
 use serde::{Deserialize, Serialize};
+use game_stats::GameStats;
+use game_error::GameError;
 
 #[derive(Serialize, Deserialize)]
 struct Config {
     analytics_consent: bool,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<(), GameError> {
     let strategy = choose_app_strategy(AppStrategyArgs {
         top_level_domain: "org".to_string(),
         author: "Kushal Hada".to_string(),
@@ -50,11 +53,13 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn play_guessing_game(analytics_consent: bool) -> Result<(), Error> {
+fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
     println!("Guess the number!");
     println!("Remember, you can update your consent by running this application with the --update-consent flag.");
 
     let secret_number = rand::thread_rng().gen_range(1..=100);
+    let mut attempts = Vec::new(); // Initialize attempts as a vector
+    let guesses = Vec::new();
 
     loop {
         println!("Please input your guess.");
@@ -69,6 +74,8 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), Error> {
             Ok(num) => num,
             Err(_) => continue,
         };
+
+        attempts.push(guess); // Add each guess to attempts
 
         println!("You guessed: {guess}");
 
@@ -96,10 +103,33 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), Error> {
         println!("The greatest common divisor of your guess and the secret number is: {gcd}");
     }
 
+    let game_stats = GameStats {
+        attempts,
+        secret_number,
+        guesses,
+    };
+
+    save_game_stats(&game_stats)?;
+
     Ok(())
 }
 
-fn fetch_hello_world() -> Result<(), Error> {
+fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
+    let strategy = choose_app_strategy(AppStrategyArgs {
+        top_level_domain: "org".to_string(),
+        author: "Kushal Hada".to_string(),
+        app_name: "KusGuessingGame".to_string(),
+    }).unwrap();
+
+    let stats_path = strategy.data_dir().join("game_stats.json");
+    let stats_data = serde_json::to_string(&game_stats).expect("Unable to serialize game stats");
+    fs::create_dir_all(strategy.data_dir()).expect("Unable to create data directory");
+    fs::write(stats_path, stats_data)?;
+
+    Ok(())
+}
+
+fn fetch_hello_world() -> Result<(), GameError> {
     let client = Client::new();
     match client.get("https://nice.runasp.net/Analytics/HelloWorld").send() {
         Ok(response) => {
