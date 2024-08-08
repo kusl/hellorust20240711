@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 pub fn gcd(mut n: u32, mut m: u32) -> u32 {
     if n == 0 || m == 0 {
         return std::cmp::max(n, m);
@@ -15,6 +13,7 @@ pub fn gcd(mut n: u32, mut m: u32) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Instant;
 
     #[test]
     fn test_gcd() {
