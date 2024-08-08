@@ -103,6 +103,13 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
 
                 save_game_stats(&game_stats)?;
 
+                // Display the entire game history
+                let game_history = read_game_history()?;
+                println!("All Games History:");
+                for (index, game) in game_history.games.iter().enumerate() {
+                    println!("Game {}: Attempts: {:?}, Secret Number: {}, Guesses: {:?}", index + 1, game.attempts, game.secret_number, game.guesses);
+                }
+
                 println!("Press Enter to exit...");
                 let mut exit = String::new();
                 io::stdin().read_line(&mut exit).expect("Failed to read line");
@@ -160,4 +167,22 @@ fn fetch_hello_world() -> Result<(), GameError> {
         }
     }
     Ok(())
+}
+
+fn read_game_history() -> Result<GameHistory, GameError> {
+    let strategy = choose_app_strategy(AppStrategyArgs {
+        top_level_domain: "org".to_string(),
+        author: "Kushal Hada".to_string(),
+        app_name: "KusGuessingGame".to_string(),
+    }).unwrap();
+
+    let stats_path = strategy.data_dir().join("game_stats.json");
+
+    if stats_path.exists() {
+        let stats_data = fs::read_to_string(&stats_path)?;
+        let game_history: GameHistory = serde_json::from_str(&stats_data)?;
+        Ok(game_history)
+    } else {
+        Ok(GameHistory { games: Vec::new() })
+    }
 }
