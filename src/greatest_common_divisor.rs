@@ -1,9 +1,8 @@
+use std::time::Instant;
+
 pub fn gcd(mut n: u32, mut m: u32) -> u32 {
-    if m == 0 {
-        return n;
-    }
-    if n == 0 {
-        return m;
+    if n == 0 || m == 0 {
+        return std::cmp::max(n, m);
     }
     while m != 0 {
         let t = m;
@@ -12,6 +11,7 @@ pub fn gcd(mut n: u32, mut m: u32) -> u32 {
     }
     n
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -105,5 +105,47 @@ mod tests {
     #[test]
     fn test_large_numbers() {
         assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
+    }
+
+    #[test]
+    fn test_large_numbers_performance() {
+        assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
+        assert_eq!(gcd(1_000_000_000, 1), 1);
+    }
+    
+    #[test]
+    fn test_large_numbers_performance_single() {
+        let start = Instant::now();
+        assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
+        let duration = start.elapsed();
+        println!("Time taken for gcd(1_000_000_000, 500_000_000): {:?}", duration);
+
+        let start = Instant::now();
+        assert_eq!(gcd(1_000_000_000, 1), 1);
+        let duration = start.elapsed();
+        println!("Time taken for gcd(1_000_000_000, 1): {:?}", duration);
+    }
+
+    #[test]
+    fn test_large_numbers_performance_multiple() {
+        let iterations = 1_000;
+        let mut total_duration = 0;
+
+        for _ in 0..iterations {
+            let start = Instant::now();
+            let result = gcd(1_000_000_000, 500_000_000);
+            assert_eq!(result, 500_000_000);
+            total_duration += start.elapsed().as_nanos();
+        }
+        println!("Average time taken for gcd(1_000_000_000, 500_000_000): {} ns", total_duration / iterations);
+
+        total_duration = 0;
+        for _ in 0..iterations {
+            let start = Instant::now();
+            let result = gcd(1_000_000_000, 1);
+            assert_eq!(result, 1);
+            total_duration += start.elapsed().as_nanos();
+        }
+        println!("Average time taken for gcd(1_000_000_000, 1): {} ns", total_duration / iterations);
     }
 }
