@@ -24,14 +24,7 @@ struct Config {
 }
 
 fn main() -> Result<(), GameError> {
-    let strategy = choose_app_strategy(AppStrategyArgs {
-        top_level_domain: "org".to_string(),
-        author: "Kushal Hada".to_string(),
-        app_name: "KusGuessingGame".to_string(),
-    }).map_err(|e| {
-        eprintln!("Failed to choose app strategy: {}", e);
-        GameError::ConfigError
-    })?;
+    let strategy = get_app_strategy()?;
 
     let config_path = strategy.config_dir().join("config.json");
     let mut config = if config_path.exists() {
@@ -70,7 +63,7 @@ fn update_consent(config: &mut Config, config_path: &std::path::Path, strategy: 
         eprintln!("Unable to create config directory: {}", e);
         GameError::ConfigError
     })?;
-    fs::write(&config_path, config_data).map_err(|e| {
+    fs::write(config_path, config_data).map_err(|e| {
         eprintln!("Unable to write config file: {}", e);
         GameError::ConfigError
     })?;
@@ -153,14 +146,7 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
 }
 
 fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
-    let strategy = choose_app_strategy(AppStrategyArgs {
-        top_level_domain: "org".to_string(),
-        author: "Kushal Hada".to_string(),
-        app_name: "KusGuessingGame".to_string(),
-    }).map_err(|e| {
-        eprintln!("Failed to choose app strategy: {}", e);
-        GameError::ConfigError
-    })?;
+    let strategy = get_app_strategy()?;
 
     let stats_path = strategy.data_dir().join("game_stats.json");
 
@@ -198,14 +184,7 @@ fn fetch_hello_world() -> Result<(), GameError> {
 }
 
 fn read_game_history() -> Result<GameHistory, GameError> {
-    let strategy = choose_app_strategy(AppStrategyArgs {
-        top_level_domain: "org".to_string(),
-        author: "Kushal Hada".to_string(),
-        app_name: "KusGuessingGame".to_string(),
-    }).map_err(|e| {
-        eprintln!("Failed to choose app strategy: {}", e);
-        GameError::ConfigError
-    })?;
+    let strategy = get_app_strategy()?;
 
     let stats_path = strategy.data_dir().join("game_stats.json");
 
@@ -216,4 +195,15 @@ fn read_game_history() -> Result<GameHistory, GameError> {
     } else {
         Ok(GameHistory { games: Vec::new() })
     }
+}
+
+fn get_app_strategy() -> Result<impl AppStrategy, GameError> {
+    choose_app_strategy(AppStrategyArgs {
+        top_level_domain: "org".to_string(),
+        author: "Kushal Hada".to_string(),
+        app_name: "KusGuessingGame".to_string(),
+    }).map_err(|e| {
+        eprintln!("Failed to choose app strategy: {}", e);
+        GameError::ConfigError
+    })
 }
