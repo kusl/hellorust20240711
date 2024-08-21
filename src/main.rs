@@ -107,9 +107,9 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
                     fetch_hello_world()?;
                 }
                 println!("Game Statistics:");
-                println!("Attempts: {:?}", attempts);
-                println!("Secret Number: {}", secret_number);
-                println!("Guesses: {:?}", guesses);
+                println!("Attempts: {attempts:?}");
+                println!("Secret Number: {secret_number}");
+                println!("Guesses: {guesses:?}");
 
                 let game_stats = GameStats {
                     attempts,
