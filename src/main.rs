@@ -29,11 +29,11 @@ fn main() -> Result<(), GameError> {
     let config_path = strategy.config_dir().join("config.json");
     let mut config = if config_path.exists() {
         let config_data = fs::read_to_string(&config_path).map_err(|e| {
-            eprintln!("Unable to read config file: {}", e);
+            eprintln!("Unable to read config file: {e}");
             GameError::ConfigError
         })?;
         serde_json::from_str(&config_data).map_err(|e| {
-            eprintln!("Unable to parse config file: {}", e);
+            eprintln!("Unable to parse config file: {e}");
             GameError::ConfigError
         })?
     } else {
@@ -56,15 +56,15 @@ fn update_consent(config: &mut Config, config_path: &std::path::Path, strategy: 
     io::stdin().read_line(&mut consent).expect("Failed to read line");
     config.analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
     let config_data = serde_json::to_string(&config).map_err(|e| {
-        eprintln!("Unable to serialize config: {}", e);
+        eprintln!("Unable to serialize config: {e}");
         GameError::ConfigError
     })?;
     fs::create_dir_all(strategy.config_dir()).map_err(|e| {
-        eprintln!("Unable to create config directory: {}", e);
+        eprintln!("Unable to create config directory: {e}");
         GameError::ConfigError
     })?;
     fs::write(config_path, config_data).map_err(|e| {
-        eprintln!("Unable to write config file: {}", e);
+        eprintln!("Unable to write config file: {e}");
         GameError::ConfigError
     })?;
     println!("Consent updated successfully.");
@@ -160,15 +160,15 @@ fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
     game_history.games.push(game_stats.clone());
 
     let stats_data = serde_json::to_string(&game_history).map_err(|e| {
-        eprintln!("Unable to serialize game stats: {}", e);
+        eprintln!("Unable to serialize game stats: {e}");
         GameError::ConfigError
     })?;
     fs::create_dir_all(strategy.data_dir()).map_err(|e| {
-        eprintln!("Unable to create data directory: {}", e);
+        eprintln!("Unable to create data directory: {e}");
         GameError::ConfigError
     })?;
     fs::write(stats_path, stats_data).map_err(|e| {
-        eprintln!("Unable to write game stats: {}", e);
+        eprintln!("Unable to write game stats: {e}");
         GameError::ConfigError
     })?;
 
@@ -203,7 +203,7 @@ fn get_app_strategy() -> Result<impl AppStrategy, GameError> {
         author: "Kushal Hada".to_string(),
         app_name: "KusGuessingGame".to_string(),
     }).map_err(|e| {
-        eprintln!("Failed to choose app strategy: {}", e);
+        eprintln!("Failed to choose app strategy: {e}");
         GameError::ConfigError
     })
 }
