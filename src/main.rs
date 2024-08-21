@@ -12,7 +12,7 @@ use std::env;
 use std::fs;
 use std::io;
 use reqwest::blocking::Client;
-use etcetera::{choose_app_strategy, AppStrategyArgs, AppStrategy};
+use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
 use serde::{Deserialize, Serialize};
 use game_stats::GameStats;
 use game_error::GameError;
@@ -28,30 +28,53 @@ fn main() -> Result<(), GameError> {
         top_level_domain: "org".to_string(),
         author: "Kushal Hada".to_string(),
         app_name: "KusGuessingGame".to_string(),
-    }).unwrap();
+    }).map_err(|e| {
+        eprintln!("Failed to choose app strategy: {}", e);
+        GameError::ConfigError
+    })?;
 
     let config_path = strategy.config_dir().join("config.json");
     let mut config = if config_path.exists() {
-        let config_data = fs::read_to_string(&config_path).expect("Unable to read config file");
-        serde_json::from_str(&config_data).expect("Unable to parse config file")
+        let config_data = fs::read_to_string(&config_path).map_err(|e| {
+            eprintln!("Unable to read config file: {}", e);
+            GameError::ConfigError
+        })?;
+        serde_json::from_str(&config_data).map_err(|e| {
+            eprintln!("Unable to parse config file: {}", e);
+            GameError::ConfigError
+        })?
     } else {
         Config { analytics_consent: false }
     };
 
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 && args[1] == "--update-consent" {
-        println!("Do you consent to analytics? (yes/no)");
-        let mut consent = String::new();
-        io::stdin().read_line(&mut consent).expect("Failed to read line");
-        config.analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
-        let config_data = serde_json::to_string(&config).expect("Unable to serialize config");
-        fs::create_dir_all(strategy.config_dir()).expect("Unable to create config directory");
-        fs::write(&config_path, config_data).expect("Unable to write config file");
-        println!("Consent updated successfully.");
+        update_consent(&mut config, &config_path, &strategy)?;
         return Ok(());
     }
 
     play_guessing_game(config.analytics_consent)?;
+    Ok(())
+}
+
+fn update_consent(config: &mut Config, config_path: &std::path::Path, strategy: &impl AppStrategy) -> Result<(), GameError> {
+    println!("Do you consent to analytics? (yes/no)");
+    let mut consent = String::new();
+    io::stdin().read_line(&mut consent).expect("Failed to read line");
+    config.analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
+    let config_data = serde_json::to_string(&config).map_err(|e| {
+        eprintln!("Unable to serialize config: {}", e);
+        GameError::ConfigError
+    })?;
+    fs::create_dir_all(strategy.config_dir()).map_err(|e| {
+        eprintln!("Unable to create config directory: {}", e);
+        GameError::ConfigError
+    })?;
+    fs::write(&config_path, config_data).map_err(|e| {
+        eprintln!("Unable to write config file: {}", e);
+        GameError::ConfigError
+    })?;
+    println!("Consent updated successfully.");
     Ok(())
 }
 
@@ -134,7 +157,10 @@ fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
         top_level_domain: "org".to_string(),
         author: "Kushal Hada".to_string(),
         app_name: "KusGuessingGame".to_string(),
-    }).unwrap();
+    }).map_err(|e| {
+        eprintln!("Failed to choose app strategy: {}", e);
+        GameError::ConfigError
+    })?;
 
     let stats_path = strategy.data_dir().join("game_stats.json");
 
@@ -147,25 +173,27 @@ fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
 
     game_history.games.push(game_stats.clone());
 
-    let stats_data = serde_json::to_string(&game_history).expect("Unable to serialize game stats");
-    fs::create_dir_all(strategy.data_dir()).expect("Unable to create data directory");
-    fs::write(stats_path, stats_data)?;
+    let stats_data = serde_json::to_string(&game_history).map_err(|e| {
+        eprintln!("Unable to serialize game stats: {}", e);
+        GameError::ConfigError
+    })?;
+    fs::create_dir_all(strategy.data_dir()).map_err(|e| {
+        eprintln!("Unable to create data directory: {}", e);
+        GameError::ConfigError
+    })?;
+    fs::write(stats_path, stats_data).map_err(|e| {
+        eprintln!("Unable to write game stats: {}", e);
+        GameError::ConfigError
+    })?;
 
     Ok(())
 }
 
-
 fn fetch_hello_world() -> Result<(), GameError> {
     let client = Client::new();
-    match client.get("https://nice.runasp.net/Analytics/HelloWorld").send() {
-        Ok(response) => {
-            let text = response.text()?;
-            println!("Response from server: {text}");
-        }
-        Err(e) => {
-            println!("Failed to fetch response: {e}");
-        }
-    }
+    let response = client.get("https://nice.runasp.net/Analytics/HelloWorld").send()?;
+    let text = response.text()?;
+    println!("Response from server: {text}");
     Ok(())
 }
 
@@ -174,7 +202,10 @@ fn read_game_history() -> Result<GameHistory, GameError> {
         top_level_domain: "org".to_string(),
         author: "Kushal Hada".to_string(),
         app_name: "KusGuessingGame".to_string(),
-    }).unwrap();
+    }).map_err(|e| {
+        eprintln!("Failed to choose app strategy: {}", e);
+        GameError::ConfigError
+    })?;
 
     let stats_path = strategy.data_dir().join("game_stats.json");
 

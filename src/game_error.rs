@@ -8,4 +8,6 @@ pub enum GameError {
     Io(#[from] std::io::Error),
     #[error("Serde JSON error")]
     SerdeJson(#[from] serde_json::Error),
+    #[error("Configuration Error")]
+    ConfigError,
 }
