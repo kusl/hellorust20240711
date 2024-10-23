@@ -184,3 +184,5 @@ Press Enter to exit...
 
 kushal@kusfedoravm:~/bin$
 ```
+
+![rust rover screenshot](hello-rust.png)
