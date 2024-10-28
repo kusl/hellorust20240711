@@ -5,6 +5,7 @@ mod greatest_common_divisor;
 mod game_stats;
 mod game_error;
 mod game_history;
+mod graph;
 
 use rand::Rng;
 use std::cmp::Ordering;
