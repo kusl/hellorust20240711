@@ -1,4 +1,4 @@
-# Hello, Rust 
+# Hello, Rust
 
 Tested ok on fedora linux
 

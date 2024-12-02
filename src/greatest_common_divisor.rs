@@ -111,7 +111,7 @@ mod tests {
         assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
         assert_eq!(gcd(1_000_000_000, 1), 1);
     }
-    
+
     #[test]
     fn test_large_numbers_performance_single() {
         let start = Instant::now();

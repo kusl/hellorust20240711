@@ -7,17 +7,17 @@ mod game_error;
 mod game_history;
 mod graph;
 
+use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
+use game_error::GameError;
+use game_history::GameHistory;
+use game_stats::GameStats;
 use rand::Rng;
+use reqwest::blocking::Client;
+use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::io;
-use reqwest::blocking::Client;
-use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
-use serde::{Deserialize, Serialize};
-use game_stats::GameStats;
-use game_error::GameError;
-use game_history::GameHistory;
 
 #[derive(Serialize, Deserialize)]
 struct Config {

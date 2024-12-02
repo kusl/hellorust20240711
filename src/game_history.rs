@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::game_stats::GameStats;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GameHistory {
