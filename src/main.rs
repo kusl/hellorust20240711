@@ -18,6 +18,7 @@ use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::io;
+use crate::graph::Graph;
 
 #[derive(Serialize, Deserialize)]
 struct Config {
@@ -48,6 +49,7 @@ fn main() -> Result<(), GameError> {
     }
 
     play_guessing_game(config.analytics_consent)?;
+    do_graph_stuff();
     Ok(())
 }
 
@@ -207,4 +209,21 @@ fn get_app_strategy() -> Result<impl AppStrategy, GameError> {
         eprintln!("Failed to choose app strategy: {e}");
         GameError::ConfigError
     })
+}
+
+fn do_graph_stuff() {
+    let mut graph = Graph::new();
+    graph.add_node("A");
+    graph.add_node("B");
+    graph.add_node("C");
+    graph.add_node("D");
+    graph.add_edge("A", "B");
+    graph.add_edge("A", "C");
+    graph.add_edge("B", "D");
+    graph.add_edge("C", "D");
+
+    let bfs_result = graph.bfs("A");
+    assert_eq!(bfs_result, vec!["A", "B", "C", "D"]);
+    let dfs_result = graph.dfs("A");
+    assert_eq!(dfs_result, vec!["A", "B", "D", "C"]);
 }
