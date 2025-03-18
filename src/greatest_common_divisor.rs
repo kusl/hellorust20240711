@@ -44,9 +44,7 @@ mod tests {
         assert_eq!(gcd(1, 2), 1);
 
         assert_eq!(gcd(14, 15), 1);
-        assert_eq!(gcd(2 * 3 * 5 * 11 * 17,
-                       3 * 7 * 11 * 13 * 19),
-                   3 * 11);
+        assert_eq!(gcd(2 * 3 * 5 * 11 * 17, 3 * 7 * 11 * 13 * 19), 3 * 11);
     }
 
     #[test]
@@ -117,7 +115,10 @@ mod tests {
         let start = Instant::now();
         assert_eq!(gcd(1_000_000_000, 500_000_000), 500_000_000);
         let duration = start.elapsed();
-        println!("Time taken for gcd(1_000_000_000, 500_000_000): {:?}", duration);
+        println!(
+            "Time taken for gcd(1_000_000_000, 500_000_000): {:?}",
+            duration
+        );
 
         let start = Instant::now();
         assert_eq!(gcd(1_000_000_000, 1), 1);
@@ -136,7 +137,10 @@ mod tests {
             assert_eq!(result, 500_000_000);
             total_duration += start.elapsed().as_nanos();
         }
-        println!("Average time taken for gcd(1_000_000_000, 500_000_000): {} ns", total_duration / iterations);
+        println!(
+            "Average time taken for gcd(1_000_000_000, 500_000_000): {} ns",
+            total_duration / iterations
+        );
 
         total_duration = 0;
         for _ in 0..iterations {
@@ -145,6 +149,9 @@ mod tests {
             assert_eq!(result, 1);
             total_duration += start.elapsed().as_nanos();
         }
-        println!("Average time taken for gcd(1_000_000_000, 1): {} ns", total_duration / iterations);
+        println!(
+            "Average time taken for gcd(1_000_000_000, 1): {} ns",
+            total_duration / iterations
+        );
     }
 }

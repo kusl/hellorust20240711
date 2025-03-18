@@ -52,7 +52,12 @@ impl Graph {
         result
     }
 
-    fn dfs_recursive(&self, node: &str, visited: &mut HashMap<String, bool>, result: &mut Vec<String>) {
+    fn dfs_recursive(
+        &self,
+        node: &str,
+        visited: &mut HashMap<String, bool>,
+        result: &mut Vec<String>,
+    ) {
         visited.insert(node.to_string(), true);
         result.push(node.to_string());
 

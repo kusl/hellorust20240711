@@ -1,12 +1,13 @@
-mod my_math;
-mod shadowing;
-mod my_data_types;
-mod greatest_common_divisor;
-mod game_stats;
 mod game_error;
 mod game_history;
+mod game_stats;
 mod graph;
+mod greatest_common_divisor;
+mod my_data_types;
+mod my_math;
+mod shadowing;
 
+use crate::graph::Graph;
 use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
 use game_error::GameError;
 use game_history::GameHistory;
@@ -18,7 +19,6 @@ use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::io;
-use crate::graph::Graph;
 
 #[derive(Serialize, Deserialize)]
 struct Config {
@@ -39,7 +39,9 @@ fn main() -> Result<(), GameError> {
             GameError::ConfigError
         })?
     } else {
-        Config { analytics_consent: false }
+        Config {
+            analytics_consent: false,
+        }
     };
 
     let args: Vec<String> = env::args().collect();
@@ -53,10 +55,16 @@ fn main() -> Result<(), GameError> {
     Ok(())
 }
 
-fn update_consent(config: &mut Config, config_path: &std::path::Path, strategy: &impl AppStrategy) -> Result<(), GameError> {
+fn update_consent(
+    config: &mut Config,
+    config_path: &std::path::Path,
+    strategy: &impl AppStrategy,
+) -> Result<(), GameError> {
     println!("Do you consent to analytics? (yes/no)");
     let mut consent = String::new();
-    io::stdin().read_line(&mut consent).expect("Failed to read line");
+    io::stdin()
+        .read_line(&mut consent)
+        .expect("Failed to read line");
     config.analytics_consent = matches!(consent.trim().to_lowercase().as_str(), "yes" | "y");
     let config_data = serde_json::to_string(&config).map_err(|e| {
         eprintln!("Unable to serialize config: {e}");
@@ -78,7 +86,7 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
     println!("Guess the number!");
     println!("Remember, you can update your consent by running this application with the --update-consent flag.");
 
-    let secret_number = rand::thread_rng().gen_range(1..=100);
+    let secret_number = rand::rng().random_range(1..=100);
     let mut attempts = Vec::new(); // Initialize attempts as a vector
     let mut guesses = Vec::new(); // Initialize guesses as a mutable vector
 
@@ -126,12 +134,20 @@ fn play_guessing_game(analytics_consent: bool) -> Result<(), GameError> {
                 let game_history = read_game_history()?;
                 println!("All Games History:");
                 for (index, game) in game_history.games.iter().enumerate() {
-                    println!("Game {}: Attempts: {:?}, Secret Number: {}, Guesses: {:?}", index + 1, game.attempts, game.secret_number, game.guesses);
+                    println!(
+                        "Game {}: Attempts: {:?}, Secret Number: {}, Guesses: {:?}",
+                        index + 1,
+                        game.attempts,
+                        game.secret_number,
+                        game.guesses
+                    );
                 }
 
                 println!("Press Enter to exit...");
                 let mut exit = String::new();
-                io::stdin().read_line(&mut exit).expect("Failed to read line");
+                io::stdin()
+                    .read_line(&mut exit)
+                    .expect("Failed to read line");
                 break;
             }
         }
@@ -180,7 +196,9 @@ fn save_game_stats(game_stats: &GameStats) -> Result<(), GameError> {
 
 fn fetch_hello_world() -> Result<(), GameError> {
     let client = Client::new();
-    let response = client.get("https://nice.runasp.net/Analytics/HelloWorld").send()?;
+    let response = client
+        .get("https://nice.runasp.net/Analytics/HelloWorld")
+        .send()?;
     let text = response.text()?;
     println!("Response from server: {text}");
     Ok(())
@@ -205,7 +223,8 @@ fn get_app_strategy() -> Result<impl AppStrategy, GameError> {
         top_level_domain: "org".to_string(),
         author: "Kushal Hada".to_string(),
         app_name: "KusGuessingGame".to_string(),
-    }).map_err(|e| {
+    })
+    .map_err(|e| {
         eprintln!("Failed to choose app strategy: {e}");
         GameError::ConfigError
     })
